@@ -1,0 +1,81 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Usuario de la app (puede ser cuidador o paciente)
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  role      Role
+  gender    String? // Hombre / Mujer (opcional por ahora)
+  bio       String?    @default("")
+  photoUrl  String?    @default("")
+  patients  Patient[]  @relation("CaregiverPatients")
+  createdAt DateTime   @default(now())
+  Medicine  Medicine[]
+}
+
+// Paciente vinculado a un cuidador (User.role = CUIDADOR)
+
+model Patient {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  gender      String?
+  bio         String?    @default("")
+  caregiver   User?      @relation("CaregiverPatients", fields: [caregiverId], references: [id])
+  caregiverId Int?
+  medicines   Medicine[]
+}
+
+// Medicamento asociado a un paciente
+
+model Medicine {
+  id          Int        @id @default(autoincrement())
+  name        String
+  dosage      String
+  stock       Int? // cápsulas disponibles (opcional)
+  qrData      Json? // metadatos QR (opcional)
+  patient     Patient?   @relation(fields: [patientId], references: [id])
+  patientId   Int?
+  caregiver   User?      @relation(fields: [caregiverId], references: [id])
+  caregiverId Int?
+  reminders   Reminder[]
+  createdAt   DateTime   @default(now())
+}
+
+model Reminder {
+  id         Int      @id @default(autoincrement())
+  time       String // "08:00 AM"
+  days       String // "Lu,Ma,Mi,Ju,Vi" o "" si es una sola vez
+  label      String? // "Después del almuerzo"
+  repeat     Boolean  @default(true)
+  active     Boolean  @default(true)
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  medicineId Int
+  createdAt  DateTime @default(now())
+}
+
+// Estado del robot (batería, wifi, etc.)
+
+model RobotState {
+  id         Int      @id @default(autoincrement())
+  status     String // "OK", "DISPENSANDO", "ERROR"
+  wifi       Boolean  @default(false)
+  batteryPct Int      @default(0)
+  updatedAt  DateTime @default(now())
+}
+
+enum Role {
+  CUIDADOR
+  PACIENTE
+}
