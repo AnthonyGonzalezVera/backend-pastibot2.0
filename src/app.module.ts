@@ -1,17 +1,38 @@
 import { Module } from '@nestjs/common';
+
+// Prisma (base de datos)
 import { PrismaModule } from './prisma/prisma.module';
 
+// Controladores base del sistema
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+// Módulos funcionales
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { PatientsModule } from './patients/patients.module';
+import { MedicinesModule } from './medicines/medicines.module';
+import { RemindersModule } from './reminders/reminders.module';
+
 @Module({
   imports: [
+    // Base de datos y Prisma
     PrismaModule,
-    // Aquí irán tus módulos futuros:
-    // AuthModule,
-    // UsersModule,
-    // PatientsModule,
-    // MedicinesModule,
+
+    // Autenticación (login, registro, OAuth, JWT)
+    AuthModule,
+
+    // Usuarios (perfil, actualizar usuario)
+    UsersModule,
+
+    // Pacientes (CRUD)
+    PatientsModule,
+
+    // Medicinas (CRUD)
+    MedicinesModule,
+
+    // Recordatorios
+    RemindersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
