@@ -12,7 +12,7 @@ export class RegisterDto {
   password: string;
 
   @IsEnum(Role)
-  role: Role; // 'CUIDADOR' | 'PACIENTE'
+  role: Role; 
 
   @IsOptional()
   gender?: string;

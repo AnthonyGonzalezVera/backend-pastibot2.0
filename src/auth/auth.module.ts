@@ -6,10 +6,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt.guard';
+
 import { GoogleStrategy } from './google.strategy';
 import { FacebookStrategy } from './facebook.strategy';
 import { XStrategy } from './x.strategy';
+
 import { PrismaModule } from '../prisma/prisma.module';
+import { GoogleAuthGuard } from './google.guard';
 
 @Module({
   imports: [
@@ -25,9 +28,14 @@ import { PrismaModule } from '../prisma/prisma.module';
     AuthService,
     JwtStrategy,
     JwtAuthGuard,
+
+    // OAUTH STRATEGIES
     GoogleStrategy,
     FacebookStrategy,
     XStrategy,
+
+    // CUSTOM GUARDS
+    GoogleAuthGuard,
   ],
   exports: [AuthService],
 })

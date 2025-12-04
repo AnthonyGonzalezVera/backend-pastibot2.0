@@ -29,7 +29,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return done(new Error('Google no devolvió email'), null);
     }
 
-    // Busca por providerId o por email (para no duplicar usuarios)
     let user = await this.prisma.user.findFirst({
       where: {
         OR: [
@@ -48,11 +47,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           providerId: googleId,
           verified: true,
           photoUrl: photo || '',
-          role: 'PACIENTE', // valor por defecto; luego podrás cambiarlo en el perfil
+          role: null,   // 👈 NO LE ASIGNAMOS ROL AQUÍ
         },
       });
     } else {
-      // Actualizar provider si el usuario se registró antes por email
       if (user.provider !== 'google' || user.providerId !== googleId) {
         user = await this.prisma.user.update({
           where: { id: user.id },

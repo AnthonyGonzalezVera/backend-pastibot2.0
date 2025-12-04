@@ -15,25 +15,24 @@ model User {
   id         Int        @id @default(autoincrement())
   name       String
   email      String     @unique
-  password   String?    // null cuando es login con Google, Facebook o X
-  provider   String     @default("email") // email | google | facebook | x
-  providerId String?    @unique // ID del proveedor (googleId, facebookId, xId)
+  password   String?
+  provider   String     @default("email")
+  providerId String?    @unique
   verified   Boolean    @default(false)
 
-  role       Role
+  role       Role?      // 👈 AHORA ES OPCIONAL
   gender     String?
   bio        String?    @default("")
   photoUrl   String?    @default("")
   
-  // Relaciones
   patients   Patient[]  @relation("CaregiverPatients")
   createdAt  DateTime   @default(now())
   Medicine   Medicine[]
 }
 
 
-// Paciente vinculado a un cuidador (User.role = CUIDADOR)
 
+// Paciente vinculado a un cuidador 
 model Patient {
   id          Int        @id @default(autoincrement())
   name        String
@@ -81,6 +80,13 @@ model RobotState {
   wifi       Boolean  @default(false)
   batteryPct Int      @default(0)
   updatedAt  DateTime @default(now())
+}
+
+model RobotLog {
+  id          Int      @id @default(autoincrement())
+  medicineId  Int?
+  message     String
+  createdAt   DateTime @default(now())
 }
 
 enum Role {
