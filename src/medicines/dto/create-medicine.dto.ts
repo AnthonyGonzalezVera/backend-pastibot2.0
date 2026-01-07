@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, IsInt, Min } from 'class-validator';
+import { 
+  IsNotEmpty, 
+  IsOptional, 
+  IsString, 
+  IsInt, 
+  Min, 
+  IsArray 
+} from 'class-validator';
 
 export class CreateMedicineDto {
   @IsNotEmpty()
@@ -15,5 +22,18 @@ export class CreateMedicineDto {
   stock?: number;
 
   @IsOptional()
-  qrData?: any; // puede ser un objeto JSON
+  qrData?: any;
+
+  // 🔥 NUEVOS CAMPOS
+  @IsOptional()
+  @IsString()
+  time?: string;     // "08:00"
+
+  @IsOptional()
+  @IsArray()
+  days?: string[];   // ["Lu","Ma","Mi"]
+
+  @IsOptional()
+  @IsString()
+  label?: string;
 }

@@ -14,6 +14,7 @@ import { PatientsModule } from './patients/patients.module';
 import { MedicinesModule } from './medicines/medicines.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { RobotModule } from './robot/robot.module';
+import { InvitationsModule } from './invitations/invitations.module';
 
 @Module({
   imports: [
@@ -35,7 +36,11 @@ import { RobotModule } from './robot/robot.module';
     // Recordatorios
     RemindersModule,
 
+    // Robot
     RobotModule,
+
+    // Invitaciones (agregado)
+    InvitationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

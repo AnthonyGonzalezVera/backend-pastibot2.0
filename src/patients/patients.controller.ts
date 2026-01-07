@@ -21,18 +21,18 @@ export class PatientsController {
 
   @Post()
   create(@Req() req: any, @Body() dto: CreatePatientDto) {
-    return this.patientsService.create(req.user.userId, dto);
+    return this.patientsService.create(req.user.id, dto); // ✅ CAMBIO: userId → id
   }
 
   @Get()
   findAll(@Req() req: any) {
-    return this.patientsService.findAllForCaregiver(req.user.userId);
+    return this.patientsService.findAllForCaregiver(req.user.id); // ✅ CAMBIO: userId → id
   }
 
   @Get(':id')
   findOne(@Req() req: any, @Param('id') id: string) {
     return this.patientsService.findOneForCaregiver(
-      req.user.userId,
+      req.user.id, // ✅ CAMBIO: userId → id
       Number(id),
     );
   }
@@ -44,7 +44,7 @@ export class PatientsController {
     @Body() dto: UpdatePatientDto,
   ) {
     return this.patientsService.update(
-      req.user.userId,
+      req.user.id, // ✅ CAMBIO: userId → id
       Number(id),
       dto,
     );
@@ -52,6 +52,6 @@ export class PatientsController {
 
   @Delete(':id')
   remove(@Req() req: any, @Param('id') id: string) {
-    return this.patientsService.remove(req.user.userId, Number(id));
+    return this.patientsService.remove(req.user.id, Number(id)); // ✅ CAMBIO: userId → id
   }
 }

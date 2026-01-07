@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,20 +17,21 @@ model User {
   provider   String     @default("email")
   providerId String?    @unique
   verified   Boolean    @default(false)
-
+  
   role       Role?      // 👈 AHORA ES OPCIONAL
   gender     String?
   bio        String?    @default("")
   photoUrl   String?    @default("")
   
   patients   Patient[]  @relation("CaregiverPatients")
+  invitations Invitation[] // ✅ LÍNEA AGREGADA
   createdAt  DateTime   @default(now())
   Medicine   Medicine[]
 }
 
+  
+// Paciente vinculado a un cuidador
 
-
-// Paciente vinculado a un cuidador 
 model Patient {
   id          Int        @id @default(autoincrement())
   name        String
@@ -50,16 +49,21 @@ model Medicine {
   id          Int        @id @default(autoincrement())
   name        String
   dosage      String
-  stock       Int? // cápsulas disponibles (opcional)
-  qrData      Json? // metadatos QR (opcional)
+  stock       Int?       @default(0)
+  qrData      Json?
+  time        String?         // "08:00"
+  days        String[]         // ["Lu","Ma","Mi"]
+  label       String?          // "Después del almuerzo"
+  
   patient     Patient?   @relation(fields: [patientId], references: [id])
   patientId   Int?
   caregiver   User?      @relation(fields: [caregiverId], references: [id])
   caregiverId Int?
+  
   reminders   Reminder[]
   createdAt   DateTime   @default(now())
 }
-
+ 
 model Reminder {
   id         Int      @id @default(autoincrement())
   time       String // "08:00 AM"
@@ -80,6 +84,19 @@ model RobotState {
   wifi       Boolean  @default(false)
   batteryPct Int      @default(0)
   updatedAt  DateTime @default(now())
+}
+ 
+// ✅ MODELO NUEVO AGREGADO
+model Invitation {
+  id          Int      @id @default(autoincrement())
+  token       String   @unique  // Token único para compartir
+  caregiverId Int
+  caregiver   User     @relation(fields: [caregiverId], references: [id])
+  patientEmail String?  // Email del paciente (opcional)
+  patientName  String?  // Nombre del paciente (opcional)
+  used        Boolean  @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
 }
 
 model RobotLog {
