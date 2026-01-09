@@ -1,12 +1,17 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class CreatePatientDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
+
+  @IsOptional()
+  @IsNumber()
+  age?: number;
 
   @IsOptional()
   @IsString()
@@ -14,5 +19,5 @@ export class CreatePatientDto {
 
   @IsOptional()
   @IsString()
-  bio?: string;
+  condition?: string;
 }

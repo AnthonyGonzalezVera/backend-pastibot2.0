@@ -9,25 +9,38 @@ export class InvitationsController {
 
   // Generar invitación (CUIDADOR)
   @Post('generate')
-  async generate(
-    @Req() req: any,
-    @Body() body: { patientName?: string; patientEmail?: string },
-  ) {
-    const invitation = await this.invitationsService.generateInvitation(
-      req.user.id,
-      body.patientName,
-      body.patientEmail,
-    );
+async generate(
+  @Req() req: any,
+  @Body() body: { patientName?: string; patientEmail?: string },
+) {
+  const invitation = await this.invitationsService.generateInvitation(
+    req.user.id,
+    body.patientName,
+    body.patientEmail,
+  );
 
-    // Generar el link para compartir
-    const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation/${invitation.token}`;
+  const frontendUrl = process.env.FRONTEND_URL;
+  const invitationLink = `${frontendUrl}/accept-invitation/${invitation.token}`;
 
-    return {
-      invitation,
-      invitationLink,
-      whatsappMessage: `¡Hola! Te invito a usar Pastibot para gestionar tus medicamentos. Haz clic aquí: ${invitationLink}`,
-    };
-  }
+  const whatsappMessage = `Hola 👋  
+Te invito a usar *Pastibot* 🩺💊  
+
+Con esta app podrás:
+✔ recibir recordatorios  
+✔ llevar control de tus medicamentos  
+✔ estar conectado con tu cuidador  
+
+👉 Acepta la invitación aquí:
+${invitationLink}
+
+Si no tienes la app, podrás iniciar sesión desde el navegador.`;
+
+  return {
+    invitation,
+    invitationLink,
+    whatsappMessage,
+  };
+}
 
   // Aceptar invitación (PACIENTE)
   @Post('accept/:token')

@@ -16,7 +16,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   // ===============================
   // REGISTER LOCAL
@@ -106,6 +106,88 @@ export class AuthService {
     });
 
     return this.buildAuthResponse(updated);
+  }
+
+  // ===============================
+  // FORGOT PASSWORD
+  // ===============================
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // No revelamos si el email existe o no por seguridad
+      return { message: 'Si el correo existe, recibirás un enlace para restablecer tu contraseña.' };
+    }
+
+    // Generar token único
+    const token = this.generateResetToken();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+    await this.prisma.passwordReset.create({
+      data: {
+        email,
+        token,
+        expiresAt,
+      },
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8100';
+    const resetLink = `${frontendUrl}/reset-password/${token}`;
+
+    return {
+      message: 'Si el correo existe, recibirás un enlace para restablecer tu contraseña.',
+      // En desarrollo, devolvemos el link para testing
+      resetLink: process.env.NODE_ENV !== 'production' ? resetLink : undefined,
+    };
+  }
+
+  // ===============================
+  // RESET PASSWORD
+  // ===============================
+  async resetPassword(token: string, newPassword: string) {
+    const reset = await this.prisma.passwordReset.findUnique({
+      where: { token },
+    });
+
+    if (!reset) {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
+
+    if (reset.used) {
+      throw new UnauthorizedException('Este enlace ya fue utilizado');
+    }
+
+    if (new Date() > reset.expiresAt) {
+      throw new UnauthorizedException('El enlace ha expirado');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { email: reset.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashed },
+    });
+
+    await this.prisma.passwordReset.update({
+      where: { id: reset.id },
+      data: { used: true },
+    });
+
+    return { message: 'Contraseña actualizada correctamente' };
+  }
+
+  private generateResetToken(): string {
+    return [...Array(32)].map(() => Math.random().toString(36)[2]).join('');
   }
 
   // ===============================

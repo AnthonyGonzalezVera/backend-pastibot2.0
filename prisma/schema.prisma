@@ -35,9 +35,10 @@ model User {
 model Patient {
   id          Int        @id @default(autoincrement())
   name        String
-  email       String     @unique
+  email       String?    @unique
+  age         Int?
   gender      String?
-  bio         String?    @default("")
+  condition   String?    @default("")
   caregiver   User?      @relation("CaregiverPatients", fields: [caregiverId], references: [id])
   caregiverId Int?
   medicines   Medicine[]
@@ -61,6 +62,7 @@ model Medicine {
   caregiverId Int?
   
   reminders   Reminder[]
+  dispensationLogs DispensationLog[]
   createdAt   DateTime   @default(now())
 }
  
@@ -104,6 +106,24 @@ model RobotLog {
   medicineId  Int?
   message     String
   createdAt   DateTime @default(now())
+}
+
+model DispensationLog {
+  id          Int      @id @default(autoincrement())
+  medicineId  Int
+  medicine    Medicine @relation(fields: [medicineId], references: [id])
+  patientId   Int?
+  status      String   // "DISPENSED", "TAKEN", "MISSED"
+  dispensedAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 enum Role {
